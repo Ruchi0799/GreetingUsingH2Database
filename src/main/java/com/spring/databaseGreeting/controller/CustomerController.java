@@ -6,9 +6,11 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -56,5 +58,31 @@ public class CustomerController {
 			return new ResponseEntity<Customer>(customer.get(),HttpStatus.OK);
 		}
 		return new ResponseEntity<Customer>(HttpStatus.NOT_FOUND);
+	}
+	
+	@PutMapping("/customers/{id}")
+	public ResponseEntity<Customer> updateCustomer(@RequestBody Customer customer){
+		try {
+			return new ResponseEntity<Customer>(customerRepo.save(customer),HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			// TODO: handle exception
+		}
+	}
+	
+	@DeleteMapping("/customers/{id}")
+	public ResponseEntity<HttpStatus> deleteCustomer(@PathVariable Long id){
+		try {
+			Optional<Customer> customer=customerRepo.findById(id);
+			if(customer.isPresent())
+			{
+				customerRepo.delete(customer.get());
+			}
+			return new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT);
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			return new ResponseEntity<HttpStatus>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }
